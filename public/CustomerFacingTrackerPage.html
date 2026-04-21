@@ -3,9 +3,78 @@
 <html>
   <head>
     <title>Customer Facing Tracker Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      .order-info {
+        margin-bottom: 20px;
+      }
+      .order-info h2 {
+        margin-top: 0;
+      }
+      .order-info ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .order-info li {
+        margin-bottom: 10px;
+      }
+      .order-info li span {
+        font-weight: bold;
+      }
+      .tracking-timeline {
+        margin-top: 20px;
+      }
+      .tracking-timeline ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .tracking-timeline li {
+        margin-bottom: 10px;
+      }
+      .tracking-timeline li span {
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
-    <h1>Customer Facing Tracker Page</h1>
-    <p>This is the customer-facing tracker page.</p>
+    <div class="container">
+      <h1>Order Tracking</h1>
+      <div class="order-info">
+        <h2>Order Information</h2>
+        <ul>
+          <li><span>Order Reference:</span> #KHI-20260420-089</li>
+          <li><span>Customer Name:</span> Sara Ahmed</li>
+          <li><span>Customer City:</span> Lahore, Punjab</li>
+          <li><span>Product Name:</span> Premium Watch (Black)</li>
+          <li><span>COD Amount:</span> PKR 3200</li>
+          <li><span>Courier:</span> M&P</li>
+          <li><span>Tracking Number:</span> MP-9281734</li>
+        </ul>
+      </div>
+      <div class="tracking-timeline">
+        <h2>Tracking Timeline</h2>
+        <ul>
+          <li><span>Booked:</span> Order booked at 11:42 AM on April 18, 2026</li>
+          <li><span>In Transit:</span> Order in transit at 8:15 AM on April 19, 2026</li>
+          <li><span>Out for Delivery:</span> Order out for delivery at 9:00 AM on April 20, 2026</li>
+        </ul>
+      </div>
+      <button onclick="window.open('https://wa.me/03001234567', '_blank')">Contact Seller on WhatsApp</button>
+    </div>
   </body>
 </html>
