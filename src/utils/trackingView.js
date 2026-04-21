@@ -1,3 +1,4 @@
+// src/utils/trackingView.js
 const axios = require('axios');
 const TRACKING_VIEW_API_URL = process.env.TRACKING_VIEW_API_URL;
 
