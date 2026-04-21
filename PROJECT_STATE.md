@@ -1,1 +1,1 @@
-Customer-facing tracker page UI implemented as per the provided specs.
+Customer-facing tracker page UI implemented with the specified design.

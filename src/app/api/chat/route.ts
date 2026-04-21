@@ -107,7 +107,7 @@ ${memory}
         },
       },
     },
-    maxSteps: 5,
+    maxSteps: 20,
   });
 
   return result.toUIMessageStreamResponse();
