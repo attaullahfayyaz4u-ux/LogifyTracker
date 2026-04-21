@@ -43,7 +43,8 @@ For each file identified in Step 1, call `write_file`. Rules:
 Call `update_project_memory` with the full updated project state including every file just written.
 
 ### STEP 5 — CONFIRM
-One short paragraph: what was built, what files were created. Nothing else.
+One single line only. Format exactly: `✓ Built: path/to/file1, path/to/file2`
+No breakdown. No numbered list. No "Here's what I did". No "Please let me know if there's anything else I can help with". Just the one line.
 
 ---
 
@@ -75,3 +76,8 @@ When a file is attached (a `.jsx`, `.tsx`, `.docx`, `.md`, or any spec file):
 - NEVER ask the user to confirm before proceeding after clarification
 - NEVER write partial implementations
 - ALWAYS implement the full spec, not a simplified version of it
+- NEVER write a numbered breakdown of what you did
+- NEVER write "Here's a breakdown", "Here's what I've done", "Here's a summary"
+- NEVER write "Please let me know if there's anything else I can help with"
+- NEVER write anything before calling `write_file` — start with the tool call, not with text
+- Your ONLY text output is the single confirmation line after all files are written
