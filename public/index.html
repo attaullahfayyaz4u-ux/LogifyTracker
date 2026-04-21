@@ -1,24 +1,384 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOGIFY TRACKER — Khaasimports Pakistan</title>
   <style>
-    /* add styles here */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: #fff;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .brand { display: flex; flex-direction: column; }
+    header .brand h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #e94560; }
+    header .brand span { font-size: 0.72rem; color: #a8b2d8; letter-spacing: 1px; margin-top: 2px; }
+    header .badge {
+      background: #e94560;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+    }
+
+    /* MAIN */
+    main { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* ERROR / LOADING */
+    .state-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      margin-top: 24px;
+    }
+    .state-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .state-card p { color: #666; font-size: 0.95rem; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #e94560;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* STATUS BANNER */
+    .status-banner {
+      background: linear-gradient(135deg, #e94560, #c62a47);
+      color: #fff;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(233,69,96,0.3);
+    }
+    .status-banner .label { font-size: 0.78rem; opacity: 0.85; margin-bottom: 4px; }
+    .status-banner .label-ur { font-size: 0.72rem; opacity: 0.7; direction: rtl; }
+    .status-banner .value { font-size: 1.2rem; font-weight: 700; }
+    .status-banner .status-icon { font-size: 2.2rem; }
+
+    /* INFO CARD */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #e94560;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-item .en { font-size: 0.72rem; color: #999; margin-bottom: 2px; }
+    .info-item .ur { font-size: 0.68rem; color: #bbb; direction: rtl; text-align: right; margin-bottom: 4px; }
+    .info-item .val {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1a1a2e;
+      word-break: break-word;
+    }
+    .info-item .val.mono { font-family: monospace; font-size: 0.88rem; }
+
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 9px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: #e8eaf0;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 22px;
+    }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .dot {
+      position: absolute;
+      left: -24px;
+      top: 4px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #e8eaf0;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #e8eaf0;
+    }
+    .timeline-item.active .dot {
+      background: #e94560;
+      box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
+    }
+    .timeline-item.done .dot { background: #27ae60; box-shadow: 0 0 0 2px #e8f5e9; }
+    .tl-status { font-size: 0.92rem; font-weight: 600; color: #333; }
+    .tl-status.active-text { color: #e94560; }
+    .tl-status.done-text { color: #27ae60; }
+    .tl-meta { font-size: 0.75rem; color: #999; margin-top: 3px; }
+
+    /* WHATSAPP BUTTON */
+    .wa-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 4px;
+      transition: background 0.2s;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+    }
+    .wa-btn:hover { background: #1ebe5d; }
+    .wa-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+    .wa-btn .wa-text { display: flex; flex-direction: column; align-items: flex-start; }
+    .wa-btn .wa-main { font-size: 0.95rem; }
+    .wa-btn .wa-sub { font-size: 0.72rem; opacity: 0.85; font-weight: 400; }
+
+    footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #bbb;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #e8eaf0;
+    }
   </style>
 </head>
 <body>
-  <h1>Order Tracker</h1>
-  <p>Order Reference: <span id="order-ref"></span></p>
-  <p>Customer Name: <span id="customer-name"></span></p>
-  <p>Customer City: <span id="customer-city"></span></p>
-  <p>Product Name: <span id="product-name"></span></p>
-  <p>COD Amount: <span id="cod-amount"></span></p>
-  <p>Courier: <span id="courier"></span></p>
-  <p>Tracking Number: <span id="tracking-number"></span></p>
-  <p>Current Status: <span id="current-status"></span></p>
-  <div id="timeline"></div>
-  <script>
-    // add script here
-  </script>
+
+<header>
+  <div class="brand">
+    <h1>LOGIFY TRACKER</h1>
+    <span>KHAASIMPORTS PAKISTAN · آرڈر ٹریکر</span>
+  </div>
+  <div class="badge">v1.0</div>
+</header>
+
+<main>
+  <div id="app">
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading your order… / آپ کا آرڈر لوڈ ہو رہا ہے…</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SELLER_WHATSAPP = '923001234567'; // replace with actual seller WhatsApp
+
+  const STATUS_LABELS = {
+    en: {
+      booked:       'Booked',
+      dispatched:   'Dispatched',
+      in_transit:   'In Transit',
+      out_for_delivery: 'Out for Delivery',
+      delivered:    'Delivered',
+      returned:     'Returned',
+      cancelled:    'Cancelled',
+    },
+    ur: {
+      booked:       'بک ہو گیا',
+      dispatched:   'روانہ ہو گیا',
+      in_transit:   'راستے میں ہے',
+      out_for_delivery: 'ڈیلیوری پر ہے',
+      delivered:    'پہنچ گیا',
+      returned:     'واپس آ گیا',
+      cancelled:    'منسوخ',
+    }
+  };
+
+  const STATUS_ICON = {
+    booked: '📦', dispatched: '🚚', in_transit: '🛣️',
+    out_for_delivery: '🏍️', delivered: '✅', returned: '↩️', cancelled: '❌',
+  };
+
+  const TIMELINE_ORDER = ['booked','dispatched','in_transit','out_for_delivery','delivered'];
+
+  function getToken() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('t') || params.get('token');
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleString('en-PK', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function labelEn(key) { return STATUS_LABELS.en[key] || key; }
+  function labelUr(key) { return STATUS_LABELS.ur[key] || ''; }
+
+  function render(order) {
+    const currentKey = (order.current_status || '').toLowerCase().replace(/ /g,'_');
+    const currentIdx = TIMELINE_ORDER.indexOf(currentKey);
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="status-banner">
+        <div>
+          <div class="label">Current Status · موجودہ حیثیت</div>
+          <div class="value">${labelEn(currentKey)}</div>
+          <div class="label-ur">${labelUr(currentKey)}</div>
+        </div>
+        <div class="status-icon">${STATUS_ICON[currentKey] || '📦'}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Order Information · آرڈر کی معلومات</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="en">Order Reference</div>
+            <div class="ur">آرڈر نمبر</div>
+            <div class="val mono">${order.order_ref || '—'}</div>
+          </div>
+          <div class="info-item">
+            <div class="en">Customer Name</div>
+            <div class="ur">نام</div>
+            <div class="val">${order.customer_name || '—'}</div>
+          </div>
+          <div class="info-item">
+            <div class="en">Customer City</div>
+            <div class="ur">شہر</div>
+            <div class="val">${order.customer_city || '—'}</div>
+          </div>
+          <div class="info-item">
+            <div class="en">Product Name</div>
+            <div class="ur">مصنوع</div>
+            <div class="val">${order.product_name || '—'}</div>
+          </div>
+          <div class="info-item">
+            <div class="en">COD Amount</div>
+            <div class="ur">ادائیگی</div>
+            <div class="val">PKR ${Number(order.cod_amount || 0).toLocaleString()}</div>
+          </div>
+          <div class="info-item">
+            <div class="en">Courier</div>
+            <div class="ur">کوریئر</div>
+            <div class="val">${order.courier || '—'}</div>
+          </div>
+          <div class="info-item" style="grid-column:1/-1">
+            <div class="en">Tracking Number</div>
+            <div class="ur">ٹریکنگ نمبر</div>
+            <div class="val mono">${order.tracking_number || '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tracking Timeline · ٹریکنگ ٹائم لائن</div>
+        <div class="timeline">
+          ${renderTimeline(order.timeline || [], currentIdx)}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Need Help? · مدد چاہیے؟</div>
+        <a class="wa-btn" href="https://wa.me/${SELLER_WHATSAPP}?text=${encodeURIComponent(`Hi, I need help with order ${order.order_ref}`)}" target="_blank">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          <div class="wa-text">
+            <span class="wa-main">Contact Seller on WhatsApp</span>
+            <span class="wa-sub">بیچنے والے سے رابطہ کریں</span>
+          </div>
+        </a>
+      </div>
+
+      <footer>LOGIFY TRACKER v1.0 · Khaasimports Pakistan · Powered by AI Factory</footer>
+    `;
+  }
+
+  function renderTimeline(events, currentIdx) {
+    if (!events.length) {
+      return TIMELINE_ORDER.map((key, i) => {
+        const state = i < currentIdx ? 'done' : i === currentIdx ? 'active' : '';
+        return `
+          <div class="timeline-item ${state}">
+            <div class="dot"></div>
+            <div class="tl-status ${state === 'active' ? 'active-text' : state === 'done' ? 'done-text' : ''}">${labelEn(key)}</div>
+            <div class="tl-meta">${labelUr(key)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    return events.map((ev, i) => {
+      const key = (ev.status || '').toLowerCase().replace(/ /g,'_');
+      const isActive = i === 0;
+      const state = isActive ? 'active' : 'done';
+      return `
+        <div class="timeline-item ${state}">
+          <div class="dot"></div>
+          <div class="tl-status ${isActive ? 'active-text' : 'done-text'}">${STATUS_ICON[key] || '•'} ${labelEn(key)}</div>
+          <div class="tl-meta">${ev.location ? ev.location + ' · ' : ''}${formatDate(ev.recorded_at)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  async function init() {
+    const token = getToken();
+    const app = document.getElementById('app');
+
+    if (!token) {
+      app.innerHTML = `
+        <div class="state-card">
+          <div class="icon">🔍</div>
+          <p>No tracking token found.<br/>براہ کرم صحیح لنک استعمال کریں۔</p>
+        </div>`;
+      return;
+    }
+
+    try {
+      const res = await fetch(`/track/${token}`);
+      if (!res.ok) throw new Error('Order not found');
+      const data = await res.json();
+      render(data);
+    } catch (err) {
+      app.innerHTML = `
+        <div class="state-card">
+          <div class="icon">❌</div>
+          <p>Order not found or link expired.<br/>آرڈر نہیں ملا یا لنک ختم ہو گیا۔</p>
+        </div>`;
+    }
+  }
+
+  init();
+</script>
 </body>
 </html>

@@ -83,10 +83,21 @@ export default function AgentCanvas() {
           <div key={msg.id} className="space-y-2">
             {msg.parts.map((part, i) => {
               if (part.type === 'text') {
+                // Strip injected file content, show only the user's actual prompt + file badges
+                const filePattern = /\n\n--- FILE: (.+?) ---[\s\S]*?--- END: \1 ---/g;
+                const fileNames: string[] = [];
+                let match;
+                while ((match = filePattern.exec(part.text)) !== null) fileNames.push(match[1]);
+                const cleanText = part.text.replace(/\n\n--- FILE: .+? ---[\s\S]*?--- END: .+? ---/g, '').trim();
                 return (
-                  <p key={i} className="text-neutral-300 whitespace-pre-wrap">
-                    {part.text}
-                  </p>
+                  <div key={i} className="space-y-1">
+                    {cleanText && <p className="text-neutral-300 whitespace-pre-wrap">{cleanText}</p>}
+                    {fileNames.map((name, j) => (
+                      <span key={j} className="inline-block text-xs bg-zinc-800 text-zinc-400 px-2 py-1 rounded">
+                        📄 {name}
+                      </span>
+                    ))}
+                  </div>
                 );
               }
 
@@ -113,6 +124,16 @@ export default function AgentCanvas() {
                 return (
                   <div key={i} className="text-xs text-purple-400/70 border-l-2 border-purple-500/50 pl-2 mt-2">
                     [MEMORY] Project state updated.
+                  </div>
+                );
+              }
+
+              if (part.type === 'tool-push_to_github' && p.state === 'output-available') {
+                const out = p.output as string;
+                const ok = out.startsWith('✓');
+                return (
+                  <div key={i} className={`text-xs border-l-2 pl-2 mt-2 ${ok ? 'text-blue-400/70 border-blue-500/50' : 'text-yellow-400/70 border-yellow-500/50'}`}>
+                    {ok ? '[GITHUB] ' : '[GITHUB] '}{out}
                   </div>
                 );
               }
